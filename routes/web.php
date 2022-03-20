@@ -1,6 +1,7 @@
 <?php
 
 use Inertia\Inertia;
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\OrderController;
@@ -31,7 +32,12 @@ Route::redirect('/','/logowanie');
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/panel', function () {
-        return Inertia::render('Dashboard');
+
+        return Inertia::render('Dashboard',[
+            'newOrders'=>Order::where('status','Nowe')->count(),
+            'ConfirmOrders'=>Order::where('status','Potwierdzone')->count(),
+            'InvoiceOrders'=>Order::where('status','Zafakturowane')->count()
+        ]);
     })->name('dashboard');
 
     Route::controller(OrderController::class)->group(function () {

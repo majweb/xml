@@ -16,7 +16,6 @@ import { Head,Link } from '@inertiajs/inertia-vue3';
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        WItaj {{ $page.props.auth.user.name }}
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div class="lg:text-center">
                             <h2 class="text-base text-indigo-600 font-semibold tracking-wide uppercase">Zamówienia</h2>
@@ -33,7 +32,7 @@ import { Head,Link } from '@inertiajs/inertia-vue3';
                                     </div>
                                     <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Nowe zamówienia</p>
                                 </dt>
-                                <dd class="mt-2 ml-16 text-base text-gray-500 font-bold bg-indigo-50 border-slate-50 text-center py-1">6</dd>
+                                <dd class="mt-2 ml-16 text-base text-gray-500 font-bold bg-indigo-50 border-slate-50 text-center py-1">{{$page.props.newOrders}}</dd>
                                 </div>
                                 <div class="relative">
                                 <dt>
@@ -44,7 +43,7 @@ import { Head,Link } from '@inertiajs/inertia-vue3';
                                     </div>
                                     <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Potwierdzone</p>
                                 </dt>
-                                <dd class="mt-2 ml-16 text-base text-gray-500 font-bold bg-indigo-50 border-slate-50 text-center py-1">6</dd>
+                                <dd class="mt-2 ml-16 text-base text-gray-500 font-bold bg-indigo-50 border-slate-50 text-center py-1">{{$page.props.ConfirmOrders}}</dd>
                                 </div>
 
                                     <div class="relative">
@@ -56,7 +55,7 @@ import { Head,Link } from '@inertiajs/inertia-vue3';
                                     </div>
                                     <p class="ml-16 text-lg leading-6 font-medium text-gray-900">Zafakturowane</p>
                                 </dt>
-                                <dd class="mt-2 ml-16 text-base text-gray-500 font-bold bg-indigo-50 border-slate-50 text-center py-1">6</dd>
+                                <dd class="mt-2 ml-16 text-base text-gray-500 font-bold bg-indigo-50 border-slate-50 text-center py-1">{{$page.props.InvoiceOrders}}</dd>
                                 </div>
                             </dl>
                             </div>
