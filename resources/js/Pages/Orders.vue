@@ -1,12 +1,12 @@
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue';
-import { Head } from '@inertiajs/inertia-vue3';
+import { Head, Link } from '@inertiajs/inertia-vue3';
 import Pagination from '../Components/Pagination';
 import { pickBy, throttle } from 'lodash';
 
 export default {
   components: {
-    Pagination,BreezeAuthenticatedLayout,Head
+    Pagination,BreezeAuthenticatedLayout,Head,Link
   },
   props: {
     orders: Object,
@@ -21,6 +21,7 @@ export default {
         szukaj: this.filters.szukaj,
         pole: this.filters.pole,
         sortowanie: this.filters.sortowanie,
+        typ: this.filters.typ,
       },
     };
   },
@@ -29,6 +30,10 @@ export default {
     sort(field) {
       this.params.pole = field;
       this.params.sortowanie = this.params.sortowanie === 'asc' ? 'desc' : 'asc';
+    },
+    changeType(event) {
+    let selected = event.target.value;
+      this.params.typ = selected;
     },
       colorStatus(value) {
           switch (value) {
@@ -71,22 +76,37 @@ export default {
                     <div class="p-6 bg-white border-b border-gray-200">
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div class="lg:text-center">
-                                <h2 class="text-base text-indigo-600 font-semibold tracking-wide uppercase">Zamówienia</h2>
-                                <p>Ilość wszytskich {{orders.total}}
-                                    <span class="inset-0 opacity-50 rounded-full bg-green-200 p-1 mr-2">
-                                    {{newOrders}}
+                                <h2 class="text-base text-indigo-600 font-semibold tracking-wide uppercase mb-3">Zamówienia</h2>
+                                <p class="mb-2">Wszytskie {{orders.total}}
+                                    <span class="inset-0 rounded-full bg-green-200 py-1 px-3 mr-2">
+                                    Nowe <strong>{{newOrders}}</strong>
                                     </span>
-                                    <span class="inset-0 opacity-50 rounded-full bg-blue-200 p-1 mr-2">
-                                    {{ConfirmOrders}}
+                                    <span class="inset-0 rounded-full bg-blue-200 py-1 px-3 mr-2">
+                                    Potwierdzone <strong>{{ConfirmOrders}}</strong>
                                     </span>
-                                    <span class="inset-0 opacity-50 rounded-full bg-red-200 p-1 mr-2">
-                                    {{InvoiceOrders}}
+                                    <span class="inset-0 rounded-full bg-red-200 py-1 px-3 mr-2">
+                                    Zafakturowane <strong>{{InvoiceOrders}}</strong>
                                     </span>
-
                                 </p>
                             </div>
                         </div>
                         <div class="flex items-center justify-end pb-6">
+                            <div class="form-check form-check-inline mr-2">
+                                <input id="all"  v-model="params.typ" @change="changeType($event)" checked value="Wszystkie" class="form-check-input form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:ring-indigo-600 transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="typ">
+                                <label class="form-check-label inline-block text-gray-800" for="all">Wszystkie</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-2">
+                                <input id="new" v-model="params.typ" @change="changeType($event)" value="Nowe" class="form-check-input form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:ring-indigo-600 transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="typ" >
+                                <label class="form-check-label inline-block text-gray-800" for="new">Nowe</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-2">
+                                <input id="issue" v-model="params.typ" @change="changeType($event)" value="Potwierdzone" class="form-check-input form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:ring-indigo-600 transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="typ" >
+                                <label class="form-check-label inline-block text-gray-800" for="issue">Potwierdzone</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-4">
+                                <input id="invoice" v-model="params.typ" @change="changeType($event)" value="Zafakturowane" class="form-check-input form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-indigo-600 checked:border-indigo-600 focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:bg-indigo-600 checked:focus:border-indigo-600 checked:focus:ring-indigo-600 transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="typ">
+                                <label class="form-check-label inline-block text-gray-800" for="invoice">Zafakturowane</label>
+                            </div>
                             <input type="search" v-model="params.szukaj" aria-label="Search" class="bg-gray-50 rounded-lg border-2 hover:bg-indigo-50 outline-none border-indigo-300 block focus:outline-none  focus:ring focus:border-indigo-400 focus:ring-indigo-100" name="szukaj" id="search" placeholder="Szukaj produktów...">
                         </div>
                         <div>
@@ -129,6 +149,10 @@ export default {
                                                     class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                     Status
                                                 </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Akcja
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -158,9 +182,16 @@ export default {
                                                     <span
                                                         class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                                                         <span aria-hidden
-                                                            :class="'absolute inset-0 opacity-50 rounded-full ' +  colorStatus(order.status) "></span>
+                                                            :class="'absolute inset-0 rounded-full ' +  colorStatus(order.status) "></span>
                                                     <span class="relative">{{order.status}}</span>
                                                     </span>
+                                                </td>
+                                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <p class="text-gray-900 whitespace-no-wrap">
+                                                               <Link :href="route('orders.single',order)" class="cursor-pointer text-sm hover:text-indigo-700 transition duration-75 text-gray-700 underline text-center flex justify-center">
+                                                                Szczegóły
+                                                            </Link>
+                                                    </p>
                                                 </td>
                                             </tr>
                                         </tbody>
