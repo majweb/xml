@@ -55,12 +55,19 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
-        'ftp' => [
+        'ftpOut' => [
             'driver' => 'ftp',
             'host' => env('FTP_HOST'),
             'username' => env('FTP_USERNAME'),
             'password' => env('FTP_PASSWORD'),
-            'root' => env('FTP_ROOT')
+            'root' => env('FTP_ROOT_OUT')
+        ],
+        'ftpIn' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_HOST'),
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD'),
+            'root' => env('FTP_ROOT_IN')
         ],
 
     ],

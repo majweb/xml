@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\XmlService;
+use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Spatie\ArrayToXml\ArrayToXml;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
+
 
 class OrderController extends Controller
 {
@@ -47,7 +52,7 @@ class OrderController extends Controller
 
     public function getOrders()
     {
-        $files = Storage::disk('ftp')->allFiles();
+        $files = Storage::disk('ftpOut')->allFiles();
         if($files){
             $array=[];
             $orders=[];
@@ -56,7 +61,7 @@ class OrderController extends Controller
                 if (pathinfo($file, PATHINFO_EXTENSION) == 'xml') {
                     $existFile = Order::where('filename',$file)->exists();
                     if(!$existFile){
-                        $getFile = Storage::disk('ftp')->get($file);
+                        $getFile = Storage::disk('ftpOut')->get($file);
 
                         Storage::disk('local')->put('xml/'.$file,$getFile);
 
@@ -115,7 +120,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function update($id){
+    public function update($id,XmlService $service){
 
         $validated = request()->validate([
             'products.*' => 'array',
@@ -131,17 +136,31 @@ class OrderController extends Controller
         ]);
         
         $products = $validated['products'];
-        $order = Order::with('products')->where('id',$id)->first();
+
+        $order = Order::where('id',$id)->first();
+
         foreach($products as $product){
             $order->products()->where('id',$product['id'])->update(['ordered_quantity_updated'=>$product['ordered_quantity_updated']]);
         }
+        $order->load('products');
+        $arrayToXml = $order->toArray();
+
+        $productsUpdated=$service->convertProduct($arrayToXml['products']);
+        
+        $arrayToXmlAfterConvert = $service->convertAllXml($arrayToXml,$productsUpdated);
+   
+        $result = ArrayToXml::convert($arrayToXmlAfterConvert,'Document-OrderResponse', false, 'UTF-8', '1.0');
+
+        $xml = simplexml_load_string($result);
+
+        $path = $xml->asXml(storage_path('app/xml/').'updated'.$order->filename);
+
+        $getFile = Storage::disk('local')->get('xml/updated'.$order->filename);
+
+        Storage::disk('ftpIn')->put('updated'.$order->filename,$getFile);
+        Storage::disk('local')->put('xml/'.'updated'.$order->filename,$getFile);
+     
         $order->update(['status'=>'Potwierdzone','date_of_return'=>now()]);
-
-
-        //TO DO
-
-        // Zrobic wysyłke XMLA
-
         return Redirect::route('orders')->with('message','Zmieniono zamówienie');
 
         
