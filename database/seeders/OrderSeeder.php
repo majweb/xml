@@ -16,8 +16,8 @@ class OrderSeeder extends Seeder
     public function run()
     {
         Order::factory()
-            ->count(50)
-            ->hasProducts(5)
+            ->count(0)
+            ->hasProducts(0)
             ->create();
     }
 
