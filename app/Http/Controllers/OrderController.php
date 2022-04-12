@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\XmlService;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Order;
+use App\Services\XmlService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Spatie\ArrayToXml\ArrayToXml;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Redirect;
 class OrderController extends Controller
 {
     public function index()
-    {
+    {        
         request()->validate([
             'sortowanie' => ['in:asc,desc'],
             'pole' => ['in:id,date_of_issue']
@@ -163,6 +164,32 @@ class OrderController extends Controller
         $order->update(['status'=>'Potwierdzone','date_of_return'=>now()]);
         return Redirect::route('orders')->with('message','Zmieniono zamówienie');
 
+    }
+
+    public function invoice(Order $order)
+    {
+
+        $invoices = NULL;
+        if(request()->has('szukaj')){
+            $term = request('szukaj');
+            $invoices = DB::connection('sqlsrv')->table('dok__Dokument')
+                ->join('dok_Pozycja', 'dok__Dokument.dok_Id', '=', 'dok_Pozycja.ob_DokHanId')
+                ->join('tw__Towar', 'dok_Pozycja.ob_TowId', '=', 'tw__Towar.tw_Id')
+                ->where(function($query) use ($term) {
+                    $query->where('dok__Dokument.dok_NrPelny', 'LIKE', '%' . $term . '%');
+                })
+                ->where('dok__Dokument.dok_typ',1)
+                ->select('dok__Dokument.dok_Id','dok_Pozycja.ob_WartBrutto','dok__Dokument.dok_NrPelny','dok__Dokument.dok_NrPelnyOryg','dok_Pozycja.ob_DoId', 'ob_TowId', 'tw__Towar.tw_Symbol', 'tw__Towar.tw_Nazwa', 'dok_Pozycja.ob_Ilosc', 'dok_Pozycja.ob_Jm', 'dok_Pozycja.ob_CenaNetto', 'dok_Pozycja.ob_CenaBrutto',
+                'dok_Pozycja.ob_WartNetto')
+                ->get()
+                ->groupBy('dok_NrPelny');
         
+            }
+            // dd($invoices);
+            return Inertia::render('OrdersSingleInvoice',[
+                'order'=>$order,
+                'invoices'=>$invoices,
+                'filters' => request('szukaj') ?? null
+            ]);
     }
 }

@@ -1,6 +1,6 @@
 	<script>
 import BreezeAuthenticatedLayout from "@/Layouts/Authenticated.vue";
-import { Head } from "@inertiajs/inertia-vue3";
+import { Head,Link } from "@inertiajs/inertia-vue3";
 import BreezeButton from "@/Components/Button";
 import BreezeInput from "@/Components/Input";
 import { pickBy, throttle } from "lodash";
@@ -10,7 +10,8 @@ export default {
     BreezeAuthenticatedLayout,
     Head,
 		BreezeButton,
-		BreezeInput
+		BreezeInput,
+    Link
   },
   props: {
     order: Object,
@@ -106,10 +107,11 @@ export default {
     </template>
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-					<a role="button"
-          @click="back" class="inline-flex items-center px-4 py-2 mb-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-600 focus:outline-none focus:border-indigo-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Powrót do listy</a>
-
+          <div class="flex justify-between items-center">
+            <a role="button"
+            @click="back" class="inline-flex items-center px-4 py-2 mb-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-600 focus:outline-none focus:border-indigo-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Powrót do listy</a>
+            <Link v-if="(order.date_of_return && order.status != 'Nowe')" :href="route('orders.single.invoice',order)" class="px-4 py-2 mb-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-600 focus:outline-none focus:border-indigo-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Faktura</Link>
+          </div>
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
           <div class="my-5">
             <dl

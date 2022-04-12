@@ -116,100 +116,103 @@ export default {
                         </div>
                         <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
                             <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
-                                <table class="min-w-full leading-normal">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" class="hover:cursor-pointer px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                <span class="inline-flex py-3 px-6 w-full justify-between" @click="sort('id')">Id
-                                                    <svg v-if="params.pole === 'id' && params.sortowanie === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z"/>
-                                                    </svg>
-                            
-                                                    <svg v-if="params.pole === 'id' && params.sortowanie === 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"/>
-                                                    </svg>
-                                                </span>
-                                            </th>
-                                            <th
-                                                class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                Nr. Zamówienia
-                                            </th>
-                                            <th scope="col" class="hover:cursor-pointer px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                <span class="inline-flex py-3 px-6 w-full justify-between" @click="sort('date_of_issue')">Data pobrania pliku
-                                                    <svg v-if="params.pole === 'date_of_issue' && params.sortowanie === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z"/>
-                                                    </svg>
-                            
-                                                    <svg v-if="params.pole === 'date_of_issue' && params.sortowanie === 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"/>
-                                                    </svg>
-                                                </span>
-                                            </th>
-                                            <th
-                                                class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                Data zamówienia
-                                            </th>
-                                            <th
-                                                class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                Ilość produktów
-                                            </th>
-                                            <th
-                                                class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                Status
-                                            </th>
-                                            <th
-                                                class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                Akcja
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="order in orders.data" :key="order.id">
-                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{order.id}}</td>
-                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <div class="flex items-center">
-                                                        <div class="ml-3">
-                                                            <p class="text-gray-900 whitespace-no-wrap">
-                                                                    {{ order.order_number }}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                            </td>
-                            
-                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">
-                                                    {{ order.date_of_issue }}
-                                                </p>
-                                            </td>
-                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">
-                                                    {{order.order_date}}
-                                                </p>
-                                            </td>
-                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">
-                                                    {{order.products_count}}
-                                                </p>
-                                            </td>
-                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <span
-                                                    class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                                    <span aria-hidden
-                                                        :class="'absolute inset-0 rounded-full ' +  colorStatus(order.status) "></span>
-                                                <span class="relative">{{order.status}}</span>
-                                                </span>
-                                            </td>
+                                <p v-if="orders.data.length === 0" class="rounded-md bg-indigo-100 p-5 text-center w-1/3 mx-auto my-4">Brak zamówień</p>
+                                <div v-else>
+                                    <table class="min-w-full leading-normal">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="hover:cursor-pointer px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    <span class="inline-flex py-3 px-6 w-full justify-between" @click="sort('id')">Id
+                                                        <svg v-if="params.pole === 'id' && params.sortowanie === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z"/>
+                                                        </svg>
+                                
+                                                        <svg v-if="params.pole === 'id' && params.sortowanie === 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"/>
+                                                        </svg>
+                                                    </span>
+                                                </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Nr. Zamówienia
+                                                </th>
+                                                <th scope="col" class="hover:cursor-pointer px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    <span class="inline-flex py-3 px-6 w-full justify-between" @click="sort('date_of_issue')">Data pobrania pliku
+                                                        <svg v-if="params.pole === 'date_of_issue' && params.sortowanie === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z"/>
+                                                        </svg>
+                                
+                                                        <svg v-if="params.pole === 'date_of_issue' && params.sortowanie === 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"/>
+                                                        </svg>
+                                                    </span>
+                                                </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Data zamówienia
+                                                </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Ilość produktów
+                                                </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Akcja
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="order in orders.data" :key="order.id">
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{order.id}}</td>
                                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">
-                                                            <Link :href="route('orders.single',order)" class="cursor-pointer text-sm hover:text-indigo-700 transition duration-75 text-gray-700 underline text-center flex justify-center">
-                                                            Szczegóły
-                                                        </Link>
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <Pagination class="my-10 flex justify-center" :links="orders.links"/>
+                                                    <div class="flex items-center">
+                                                            <div class="ml-3">
+                                                                <p class="text-gray-900 whitespace-no-wrap">
+                                                                        {{ order.order_number }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                </td>
+                                
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <p class="text-gray-900 whitespace-no-wrap">
+                                                        {{ order.date_of_issue }}
+                                                    </p>
+                                                </td>
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <p class="text-gray-900 whitespace-no-wrap">
+                                                        {{order.order_date}}
+                                                    </p>
+                                                </td>
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <p class="text-gray-900 whitespace-no-wrap">
+                                                        {{order.products_count}}
+                                                    </p>
+                                                </td>
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <span
+                                                        class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                                                        <span aria-hidden
+                                                            :class="'absolute inset-0 rounded-full ' +  colorStatus(order.status) "></span>
+                                                    <span class="relative">{{order.status}}</span>
+                                                    </span>
+                                                </td>
+                                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <p class="text-gray-900 whitespace-no-wrap">
+                                                                <Link :href="route('orders.single',order)" class="cursor-pointer text-sm hover:text-indigo-700 transition duration-75 text-gray-700 underline text-center flex justify-center">
+                                                                Szczegóły
+                                                            </Link>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <Pagination class="my-10 flex justify-center" :links="orders.links" />
+                                </div>
                             </div>
                         </div>  
                     </div>

@@ -1,0 +1,114 @@
+<script>
+import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue';
+import { Head, Link } from '@inertiajs/inertia-vue3';
+import Pagination from '../Components/Pagination';
+import Notification from '@/Components/Notification.vue';
+import { pickBy, throttle } from 'lodash';
+
+export default {
+  components: {
+    Pagination,BreezeAuthenticatedLayout,Head,Link,Notification
+  },
+  props: {
+    order: Object,
+    invoices: Object,
+    filters: String,
+  },
+    data() {
+    return {
+      params: {
+        szukaj: this.filters,
+      },
+    };
+  },
+    watch: {
+    params: {
+      handler: throttle(function () {
+        let params = pickBy(this.params);
+        this.$inertia.get(this.route('orders.single.invoice',this.order), params, { replace: true, preserveState: true });
+      }, 150),
+      deep: true,
+    },
+  },
+
+};
+</script>
+
+
+<template>
+    <Head title="Faktura" />
+    <BreezeAuthenticatedLayout>
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Faktura do zamówienia {{order.id}}
+            </h2>
+        </template>
+        <div class="py-12">
+        <div v-if="$page.props.flash.message">
+            <Notification :message="$page.props.flash.message" />
+        </div>
+
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        <div class="flex items-center justify-end pb-6">
+                            <input type="search" v-model="params.szukaj" aria-label="Search" class="bg-gray-50 rounded-lg border-2 hover:bg-indigo-50 outline-none border-indigo-300 block focus:outline-none  focus:ring focus:border-indigo-400 focus:ring-indigo-100" name="szukaj" id="search" placeholder="Szukaj faktury po numerze...">
+                        </div>
+                        <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+                            <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
+                                <p v-if="invoices === null || invoices.length == 0" class="rounded-md bg-indigo-100 p-5 text-center w-1/3 mx-auto my-4">Brak faktury lub brak szukanej frazy</p>
+                                <div v-else>
+                                    <table class="min-w-full leading-normal">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="hover:cursor-pointer px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    <span class="inline-flex py-3 px-6 w-full justify-between">
+                                                        Id
+                                                    </span>
+                                                </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Nr. Faktury
+                                                </th>
+                                                <th
+                                                    class="px-5 py-3 border-b-2 border-indigo-200 bg-indigo-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                    Akcja
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                         <tr v-for="(invoice,index) in invoices" :key="index">
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">t</td>
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <div class="flex items-center">
+                                                            <div class="ml-3">
+                                                                <p class="text-gray-900 whitespace-no-wrap">
+                                                                       {{index}}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                </td>
+                                
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <p class="text-gray-900 whitespace-no-wrap">
+                                                        {{invoices[index].dok_Id}}
+                                                    </p>
+                                                </td>
+                                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                                    <p class="text-gray-900 whitespace-no-wrap">
+                                                    dd                                                   
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <!-- <Pagination class="my-10 flex justify-center" :links="invoices.links" /> -->
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </BreezeAuthenticatedLayout>
+</template>

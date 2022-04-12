@@ -13,7 +13,7 @@ ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update \
-    && apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python2 \
+    && apt-get install -y gnupg gosu curl freetds-common freetds-bin ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python2 \
     && mkdir -p ~/.gnupg \
     && chmod 600 ~/.gnupg \
     && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf \
@@ -24,7 +24,7 @@ RUN apt-get update \
     && apt-get install -y php8.1-cli php8.1-dev \
        php8.1-pgsql php8.1-sqlite3 php8.1-gd \
        php8.1-curl \
-       php8.1-imap php8.1-mysql php8.1-mbstring \
+       php8.1-imap php8.1-mysql php8.1-mbstring php8.1-sybase \
        php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap \
        php8.1-intl php8.1-readline \
        php8.1-ldap \
@@ -43,6 +43,32 @@ RUN apt-get update \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
+    && ACCEPT_EULA=Y apt-get install -y mssql-tools \
+    && apt-get install -y gcc musl-dev make
+
+RUN apt-get update \
+    && apt-get install unixodbc-dev
+
+
+RUN pecl channel-update https://pecl.php.net/channel.xml \
+    && pecl install swoole \
+    && pecl install sqlsrv pdo_sqlsrv \
+    && pecl clear-cache \
+    && rm -rf /tmp/* /var/tmp/*
+
+
+RUN /bin/bash -c 'source ~/.bashrc'
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+
+RUN printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/8.1/mods-available/sqlsrv.ini
+RUN printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/8.1/mods-available/pdo_sqlsrv.ini
+
+RUN phpenmod sqlsrv pdo_sqlsrv
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.1
 

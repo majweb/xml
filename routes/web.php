@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::controller(OrderController::class)->group(function () {
         Route::get('/zamowieniaPobierz', 'getOrders')->name('orders.get');
         Route::get('/zamowienia', 'index')->name('orders');
+        Route::get('/zamowienie/{order}/faktura', 'invoice')->name('orders.single.invoice');
         Route::get('/zamowienie/{order}', 'show')->name('orders.single');
         Route::patch('/zamowienie/aktualizacja/{id}', 'update')->name('orders.single.update');
     });

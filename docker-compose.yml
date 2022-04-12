@@ -27,6 +27,7 @@ services:
             - sail
         depends_on:
             - mysql
+            - sqlserver
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -46,6 +47,21 @@ services:
             test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}"]
             retries: 3
             timeout: 5s
+    sqlserver:
+        image: 'mcr.microsoft.com/mssql/server:2019-latest'
+        container_name: sqlserver
+
+        ports:
+            - '${FORWARD_DB_PORT:-1433}:1433'
+        environment:
+            MSSQL_PID: "Express"
+            MSSQL_DATABASE: '${DB_DATABASE}'
+            SA_PASSWORD: '${DB_PASSWORD_SQL}'
+            ACCEPT_EULA: "Y"
+        volumes:
+        - "sailmssql:/var/opt/mssql"
+        networks:
+        - sail
     mailhog:
         image: 'mailhog/mailhog:latest'
         ports:
@@ -58,4 +74,6 @@ networks:
         driver: bridge
 volumes:
     sail-mysql:
+        driver: local
+    sailmssql:
         driver: local
