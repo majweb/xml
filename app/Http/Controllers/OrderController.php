@@ -166,29 +166,61 @@ class OrderController extends Controller
 
     }
 
+    public function invoiceSend(Order $order,Request $request)
+    {
+        // return response()->json('ok');
+        dd($request->all());
+    }
     public function invoice(Order $order)
     {
 
-        $invoices = NULL;
-        if(request()->has('szukaj')){
+            $invoices = NULL;
             $term = request('szukaj');
-            $invoices = DB::connection('sqlsrv')->table('dok__Dokument')
-                ->join('dok_Pozycja', 'dok__Dokument.dok_Id', '=', 'dok_Pozycja.ob_DokHanId')
-                ->join('tw__Towar', 'dok_Pozycja.ob_TowId', '=', 'tw__Towar.tw_Id')
-                ->where(function($query) use ($term) {
-                    $query->where('dok__Dokument.dok_NrPelny', 'LIKE', '%' . $term . '%');
-                })
-                ->where('dok__Dokument.dok_typ',1)
-                ->select('dok__Dokument.dok_Id','dok_Pozycja.ob_WartBrutto','dok__Dokument.dok_NrPelny','dok__Dokument.dok_NrPelnyOryg','dok_Pozycja.ob_DoId', 'ob_TowId', 'tw__Towar.tw_Symbol', 'tw__Towar.tw_Nazwa', 'dok_Pozycja.ob_Ilosc', 'dok_Pozycja.ob_Jm', 'dok_Pozycja.ob_CenaNetto', 'dok_Pozycja.ob_CenaBrutto',
-                'dok_Pozycja.ob_WartNetto')
-                ->get()
-                ->groupBy('dok_NrPelny');
-        
+
+            if(request()->has('szukaj')){
+                $invoices = DB::connection('sqlsrv')->table('dok__Dokument')
+                    ->join('dok_Pozycja', 'dok__Dokument.dok_Id', '=', 'dok_Pozycja.ob_DokHanId')
+                    ->join('tw__Towar', 'dok_Pozycja.ob_TowId', '=', 'tw__Towar.tw_Id')
+                    ->when($term,function($query,$term){
+                        $query->where('dok__Dokument.dok_NrPelny', 'LIKE', '%' . $term . '%');
+                    })
+                    ->where('dok__Dokument.dok_typ',1)
+                    ->select('dok__Dokument.dok_Id','dok_Pozycja.ob_WartBrutto','dok__Dokument.dok_NrPelny','dok__Dokument.dok_NrPelnyOryg','dok_Pozycja.ob_DoId', 'ob_TowId', 'tw__Towar.tw_Symbol', 'tw__Towar.tw_Nazwa', 'dok_Pozycja.ob_Ilosc', 'dok_Pozycja.ob_Jm', 'dok_Pozycja.ob_CenaNetto', 'dok_Pozycja.ob_CenaBrutto',
+                    'dok_Pozycja.ob_WartNetto')
+                    ->get()
+                    ->groupBy('dok_NrPelny');
+
+
+                    $sums = $invoices->mapWithKeys(function ($group,$key) {
+                        return [$key => [
+                            'ob_WartNetto'=>$group->sum('ob_WartNetto'),  
+                            'ob_WartBrutto'=>$group->sum('ob_WartBrutto'),  
+                            'reszta'=>$group->each(function($d){
+                                return [
+                                    'dok_Id'=>$d->dok_Id,
+                                    'dok_NrPelny'=>$d->dok_NrPelny,
+                                    'dok_NrPelnyOryg'=>$d->dok_NrPelnyOryg,
+                                    'dok_NrPelnyOryg'=>$d->dok_NrPelnyOryg,
+                                    'ob_CenaBrutto'=>$d->ob_CenaBrutto,
+                                    'ob_DoId'=>$d->ob_DoId,
+                                    'ob_Ilosc'=>$d->ob_Ilosc,
+                                    'ob_Jm'=>$d->ob_Jm,
+                                    'ob_TowId'=>$d->ob_TowId,
+                                    'ob_WartBrutto'=>$d->ob_WartBrutto,
+                                    'ob_WartNetto'=>$d->ob_WartNetto,
+                                    'tw_Nazwa'=>$d->tw_Nazwa,
+                                    'tw_Symbol'=>$d->tw_Symbol
+                                ];
+                            })
+                            ]
+                        ];
+                    });
             }
-            // dd($invoices);
+        
+            
             return Inertia::render('OrdersSingleInvoice',[
                 'order'=>$order,
-                'invoices'=>$invoices,
+                'invoices'=>isset($sums) ? $sums : $invoices,
                 'filters' => request('szukaj') ?? null
             ]);
     }
