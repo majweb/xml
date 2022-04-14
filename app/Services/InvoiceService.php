@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 
@@ -66,6 +67,19 @@ class InvoiceService
             ]);
             return $sums;
         }
+        
     }
+
+      public function convertAllXml()
+      {
+            $arrayToXmlAfterConvert = [
+            'OrderResponse-Header'=>[
+                  'OrderResponseNumber'=>1,
+                  'OrderResponseDate'=>now()->format('Y-m-d'),
+                  'ResponseType'=>29,
+            ]
+            ];
+            return $arrayToXmlAfterConvert;
+      }
 
 }

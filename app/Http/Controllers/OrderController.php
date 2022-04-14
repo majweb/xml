@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Order;
+use Illuminate\Support\Str;
 use App\Services\XmlService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -164,17 +165,48 @@ class OrderController extends Controller
 
     }
 
-    public function invoiceSend(Order $order,Request $request)
+    public function invoiceSend(Order $order,Request $request, InvoiceService $InvoiceService)
     {
              $validated = request()->validate([
-             'pdf' => 'nullable|file|mimes:pdf|max:5MB',
+             'pdf' => 'nullable|file|mimes:pdf|max:5000',
              'invoice' => 'required',
              ],[
              'invoice'=>'Brak Wybranej faktury',
             'pdf.mimes'=>'Plik musi być w formacie Pdf',
             'pdf.max'=>'Plik maksymalnie do 5MB'
              ]);
-            dd($validated);
+
+             if ($request->hasFile('pdf')) {
+                $fileName = 'invoice-'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.pdf';
+                $validated['pdf']->storeAs('pdf/',$fileName,'local');
+                // $validated['pdf']->storeAs('/',$fileName,'ftpIn');odkomentować
+             }
+
+             $order->invoice()->create([
+                 'dok_id'=>$validated['invoice']['reszta'][0]['dok_Id'],
+                 'nr_pelny_oryg'=>$validated['invoice']['dok_NrPelnyOryg'],
+                 'wartosc_brutto'=>$validated['invoice']['ob_WartBrutto'],
+                 'wartosc_netto'=>$validated['invoice']['ob_WartNetto'],
+                 'ilosc_produktow'=>count($validated['invoice']['reszta']),
+                 'faktura'=>isset($fileName) ? $fileName : null
+             ]);
+
+            $arrayToXml = $validated['invoice'];
+
+            $arrayToXmlAfterConvert = $InvoiceService->convertAllXml($arrayToXml);
+
+            $result = ArrayToXml::convert($arrayToXmlAfterConvert,'RootTag', false, 'UTF-8', '1.0');
+
+            $xml = simplexml_load_string($result);
+            
+            $xml->asXml(storage_path('app/xml/').'invoice'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml');
+
+            $getFile = Storage::disk('local')->get('xml/invoice'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml');
+
+            Storage::disk('ftpIn')->put('invoice'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml',$getFile);
+
+            // $order->update(['status'=>'Zafakturowane','date_of_invoice'=>now()]) odkomentować
+            return Redirect::route('orders')->with('message','Zafakturowano zamówienie');
     }
 
 
@@ -182,10 +214,28 @@ class OrderController extends Controller
     {
             $invoices = NULL;
             $sums = $InvoiceService->getInvoices();
+            $order->load('invoice');
+
             return Inertia::render('OrdersSingleInvoice',[
                 'order'=>$order,
                 'invoices'=>isset($sums) ? $sums : $invoices,
                 'filters' => request('szukaj') ?? null
             ]);
+    }
+
+    public function invoiceShow(Order $order)
+    {
+        $path = storage_path('app/pdf/').$order->invoice->faktura;
+         $headers = array(
+         'Content-Type: application/pdf'
+         );
+        if (file_exists($path)) {
+            return response()->download($path, $order->invoice->faktura, $headers);
+        }
+
+
+
+
+
     }
 }

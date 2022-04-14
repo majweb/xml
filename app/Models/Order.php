@@ -14,33 +14,36 @@ class Order extends Model
 
     public function products()
     {
-
         return $this->hasMany(OrderProduct::class);
+    }
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
     }
 
     protected function dateOfIssue(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null,
+            get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null
         );
     }
     protected function dateOfReturn(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null,
+            get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null
         );
     }
     protected function dateOfInvoice(): Attribute
     {
             return Attribute::make(
-                get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null,
+                get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null
             );
         
     }
     protected function orderDate(): Attribute
     {
             return Attribute::make(
-                get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null,
+                get: fn ($value) =>  $value ? Carbon::parse($value)->format('d-m-Y H:i:s') : null
             );
         
     }
