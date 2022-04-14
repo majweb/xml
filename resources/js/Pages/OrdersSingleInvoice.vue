@@ -23,8 +23,7 @@ export default {
       selected:null,
       
       form: this.$inertia.form({
-        pdf: null,
-        invoice:this.selected
+        pdf: null
       }),
     };
   },
@@ -35,6 +34,22 @@ export default {
       removeSelection(){
           this.selected = null;
       },
+      submit(){
+            this.form.transform((data) => (
+                {
+                ...data,
+                invoice:this.selected
+                }
+            ))
+            .post(route('orders.single.invoice.post',this.order),
+                {
+                onSuccess: () => {
+                    form.reset();
+                    this.selected = null;
+                }
+        }
+        )
+      }
   },
     watch: {
     params: {
@@ -62,32 +77,21 @@ export default {
         <div v-if="$page.props.flash.message">
             <Notification :message="$page.props.flash.message" />
         </div>
-
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <div class="flex items-center justify-between pb-6">
                             <Link :href="route('orders.single',order)" class="px-4 py-2 mb-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-600 focus:outline-none focus:border-indigo-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Powrót</Link>
+                            <p v-if="selected" class="bg-indigo-100 p-3 text-center rounded-md">Obecnie wybrany numer faktury: {{selected.dok_NrPelnyOryg}}</p>
                             <input type="search" v-model="params.szukaj" aria-label="Search" class="bg-gray-50 rounded-lg border-2 hover:bg-indigo-50 outline-none border-indigo-300 block focus:outline-none  focus:ring focus:border-indigo-400 focus:ring-indigo-100" name="szukaj" id="search" placeholder="Szukaj faktury po numerze...">
-                            
-                            <form enctype="multipart/form-data" v-if="selected" @submit.prevent="form.post(route('orders.single.invoice.post',this.order),
-                                    {
-                                    onSuccess: () => {
-                                        form.reset();
-                                        this.selected = null;
-                                    }
-                            }
-                            )">
-                            <input type="file" @input="form.pdf = $event.target.files[0]" />
-                            <input type="hidden" model="form.invoice" />
-
-                            <div v-if="form.errors.pdf">{{ form.errors.pdf }}</div>
-                            <progress v-if="form.progress" :value="form.progress.percentage" max="100">
-                            {{ form.progress.percentage }}%
-                            </progress>
-                                <button type="submit" :disabled="form.processing">Wyślij fakture</button>
+                        </div>
+                        <div v-if="selected" class="flex items-center justify-center mt-2 pb-6 flex-column">
+                            <hr>
+                            <form enctype="multipart/form-data" @submit.prevent="submit">
+                                <input type="file" @input="form.pdf = $event.target.files[0]" />
+                                <button class="px-4 py-2 mb-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-600 focus:outline-none focus:border-green-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2" type="submit" :loading="form.processing" :disabled="form.processing">Wyślij fakture {{form.progress ? form.progress.percentage + '%...'  :null}}</button>
+                                <p class="bg-red-400 my-2 p-2 text-center text-white" v-if="form.errors.pdf">{{ form.errors.pdf }}</p>
                             </form>
-
                         </div>
                         <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
                             <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
@@ -124,7 +128,7 @@ export default {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                         <tr v-for="(invoice,index) in invoices" :key="index">
+                                         <tr v-for="(invoice,index) in invoices.data" :key="index">
                                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{invoice.reszta[0].dok_Id ?? null}}</td>
                                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                     <div class="flex items-center">
@@ -138,12 +142,12 @@ export default {
                                 
                                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                     <p class="text-gray-900 whitespace-no-wrap">
-                                                        {{invoices[index].ob_WartNetto.toFixed(3)}} zł
+                                                        {{invoices.data[index].ob_WartNetto.toFixed(3)}} zł
                                                     </p>
                                                 </td>
                                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                     <p class="text-gray-900 whitespace-no-wrap">
-                                                        {{invoices[index].ob_WartBrutto.toFixed(3)}} zł
+                                                        {{invoices.data[index].ob_WartBrutto.toFixed(3)}} zł
                                                     </p>
                                                 </td>
                                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -159,7 +163,7 @@ export default {
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <!-- <Pagination class="my-10 flex justify-center" :links="invoices.links" /> -->
+                                    <Pagination v-if="!selected" class="my-10 flex justify-center" :links="invoices.links" />
                                 </div>
                             </div>
                         </div>  
