@@ -82,7 +82,7 @@ export default {
                     <div class="p-6 bg-white border-b border-gray-200">
                         <div class="flex items-center justify-between pb-6">
                             <Link :href="route('orders.single',order)" class="px-4 py-2 mb-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-600 focus:outline-none focus:border-indigo-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Powrót</Link>
-                            <p v-if="selected" class="bg-indigo-100 p-3 text-center rounded-md">Obecnie wybrany numer faktury: {{selected.dok_NrPelnyOryg}}</p>
+                            <p v-if="selected" class="bg-indigo-100 p-3 text-center rounded-md">Obecnie wybrany numer faktury: {{selected.dok_NrPelny}}</p>
                             <input v-if="!order.invoice" type="search" v-model="params.szukaj" aria-label="Search" class="bg-gray-50 rounded-lg border-2 hover:bg-indigo-50 outline-none border-indigo-300 block focus:outline-none  focus:ring focus:border-indigo-400 focus:ring-indigo-100" name="szukaj" id="search" placeholder="Szukaj faktury">
                         </div>
                         <div v-if="selected" class="flex items-center justify-center mt-2 pb-6 flex-column">
@@ -130,7 +130,7 @@ export default {
                                             </thead>
                                             <tbody>
                                             <tr v-for="(invoice,index) in invoices.data" :key="index">
-                                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{invoice.reszta[0].dok_Id ?? null}}</td>
+                                                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{invoice.dok_Id ?? null}}</td>
                                                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                         <div class="flex items-center">
                                                                 <div class="ml-3">
@@ -158,8 +158,8 @@ export default {
                                                     </td>
                                                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                         <button v-if="selected == null" @click="saveSelection(invoice)" class="px-4 py-2 mb-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-600 focus:outline-none focus:border-green-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Wybierz</button>
-                                                        <button v-else-if="selected.reszta[0].dok_Id === invoice.reszta[0].dok_Id" @click="removeSelection" class="px-4 py-2 mb-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-600 focus:outline-none focus:border-red-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Usuń</button>
-                                                        <button v-else-if="selected.reszta[0].dok_Id !== invoice.reszta[0].dok_Id" class="px-4 py-2 mb-2 bg-gray-600 border opacity-10 border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-600 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2" disabled>Usuń</button>
+                                                        <button v-else-if="selected.dok_Id === invoice.dok_Id" @click="removeSelection" class="px-4 py-2 mb-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-600 focus:outline-none focus:border-red-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Usuń</button>
+                                                        <button v-else-if="selected.dok_Id !== invoice.dok_Id" class="px-4 py-2 mb-2 bg-gray-600 border opacity-10 border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-600 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2" disabled>Usuń</button>
                                                     </td>
                                                 </tr>
                                             </tbody>

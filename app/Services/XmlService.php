@@ -14,11 +14,11 @@ class XmlService
                 'LineNumber'=>$product['line_number'],
                 'EAN'=>$product['ean'],
                 'LineItemStatus'=>5,
-                'BuyerItemCode'=>$product['buyer_item_code'],
-                'ItemDescription'=>$product['item_description'],
-                'OrderedQuantity'=>$product['ordered_quantity_updated'],
-                'UnitOfMeasure'=>$product['unit_of_measure'],
-                'ExpectedDeliveryDate'=>$product['expected_delivery_date'],
+                'ItemDescription'=>[
+                    '_cdata' => $product['item_description']
+                ],
+                'OrderedQuantity'=>$product['ordered_quantity'],
+                'QuantityToBeDelivered'=>$product['ordered_quantity_updated'],
             ];
         }
         return $productsAfter;
@@ -26,14 +26,18 @@ class XmlService
     
     public function convertAllXml($xml,$products)
     {
-  
+        $sum=0;
+        foreach($products as $key=> $product){
+            foreach($product as $el){
+                $sum += $el['QuantityToBeDelivered'];
+            }
+        }
+
         $arrayToXmlAfterConvert = [
             'OrderResponse-Header'=>[
                 'OrderResponseNumber'=>1,
                 'OrderResponseDate'=>now()->format('Y-m-d'),
-                'ExpectedDeliveryDate'=>Carbon::parse($xml['expected_delivery_date'])->format('Y-m-d'),
                 'OrderNumber'=>$xml['order_number'],
-                'OrderDate'=>Carbon::parse($xml['order_date'])->format('Y-m-d'),
                 'ResponseType'=>29,
             ],
             'OrderResponse-Parties'=>[
@@ -41,7 +45,7 @@ class XmlService
                     'ILN'=>$xml['buyer_iln']
                 ],
                 'Invoicee'=>[
-                    'ILN'=>1
+                    'ILN'=>$xml['buyer_iln']
                 ],
                 'Seller'=>[
                     'ILN'=>$xml['seller_iln']
@@ -56,7 +60,8 @@ class XmlService
                 
             ],
             'OrderResponse-Summary'=>[
-                'TotalLines'=>count($xml['products'])
+                'TotalLines'=>count($xml['products']),
+                'TotalOrderedAmount'=>$sum,
             ]
         ];
         return $arrayToXmlAfterConvert;

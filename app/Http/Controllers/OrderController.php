@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Redirect;
 class OrderController extends Controller
 {
     public function index()
-    {        
+    {  
         request()->validate([
             'sortowanie' => ['in:asc,desc'],
             'pole' => ['in:id,date_of_issue']
@@ -153,12 +153,12 @@ class OrderController extends Controller
 
         $xml = simplexml_load_string($result);
 
-        $path = $xml->asXml(storage_path('app/xml/').'updated'.$order->filename);
+        $path = $xml->asXml(storage_path('app/xml/').'orderresp-'.$order->filename);
 
-        $getFile = Storage::disk('local')->get('xml/updated'.$order->filename);
+        $getFile = Storage::disk('local')->get('xml/orderresp-'.$order->filename);
 
-        Storage::disk('ftpIn')->put('updated'.$order->filename,$getFile);
-        Storage::disk('local')->put('xml/'.'updated'.$order->filename,$getFile);
+        Storage::disk('ftpIn')->put('orderresp-'.$order->filename,$getFile);
+        Storage::disk('local')->put('xml/'.'orderresp-'.$order->filename,$getFile);
      
         $order->update(['status'=>'Potwierdzone','date_of_return'=>now()]);
         return Redirect::route('orders')->with('message','Zmieniono zamówienie');
@@ -179,7 +179,7 @@ class OrderController extends Controller
              if ($request->hasFile('pdf')) {
                 $fileName = 'invoice-'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.pdf';
                 $validated['pdf']->storeAs('pdf/',$fileName,'local');
-                // $validated['pdf']->storeAs('/',$fileName,'ftpIn');odkomentować
+                $validated['pdf']->storeAs('/',$fileName,'ftpIn');
              }
 
              $order->invoice()->create([
@@ -193,19 +193,20 @@ class OrderController extends Controller
 
             $arrayToXml = $validated['invoice'];
 
-            $arrayToXmlAfterConvert = $InvoiceService->convertAllXml($arrayToXml);
+            $productsUpdated=$InvoiceService->convertProduct($arrayToXml['reszta'],$order);
+            $arrayToXmlAfterConvert = $InvoiceService->convertAllXml($arrayToXml,$productsUpdated,$order);
 
-            $result = ArrayToXml::convert($arrayToXmlAfterConvert,'RootTag', false, 'UTF-8', '1.0');
+            $result = ArrayToXml::convert($arrayToXmlAfterConvert,'Document-Invoice', false, 'UTF-8', '1.0');
 
             $xml = simplexml_load_string($result);
             
-            $xml->asXml(storage_path('app/xml/').'invoice'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml');
+            $xml->asXml(storage_path('app/xml/').'invoice-'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml');
 
-            $getFile = Storage::disk('local')->get('xml/invoice'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml');
+            $getFile = Storage::disk('local')->get('xml/invoice-'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml');
 
-            Storage::disk('ftpIn')->put('invoice'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml',$getFile);
+            Storage::disk('ftpIn')->put('invoice-'.Str::slug($validated['invoice']['dok_NrPelnyOryg'],'-').'.xml',$getFile);
 
-            // $order->update(['status'=>'Zafakturowane','date_of_invoice'=>now()]) odkomentować
+            $order->update(['status'=>'Zafakturowane','date_of_invoice'=>now()]);
             return Redirect::route('orders')->with('message','Zafakturowano zamówienie');
     }
 
