@@ -79,8 +79,8 @@ class InvoiceService
     }
     public function convertProduct($products,$order)
     {
-        $productsAfter=[];
         $order->load('products');
+        $productsAfter=[];
         foreach($products as $key=> $product){
             $productsAfter['Line-Item'][]=
             [
@@ -90,7 +90,7 @@ class InvoiceService
                 'ItemDescription'=>$product['tw_Nazwa'],
                 'ItemType'=>'IN',
                 'InvoiceQuantity'=>$product['ob_Ilosc'],
-                'UnitOfMeasure'=>$product['ob_Jm'],
+                'UnitOfMeasure'=>'PCE',
                 'InvoiceUnitNetPrice'=>$product['ob_CenaNetto'],
                 'TaxRate'=>$product['ob_VatProc'],
                 'TaxCategoryCode'=>'S',
@@ -100,14 +100,14 @@ class InvoiceService
                 'Line-Order'=>[
                     'BuyerOrderNumber'=>$order->order_number,
                     'SupplierOrderNumber'=>$order->order_number,
-                    'BuyerOrderDate'=>$order->order_date,
+                    'BuyerOrderDate'=>Carbon::parse($order->order_date)->format('Y-m-d'),
                 ],
                 'Line-Delivery'=>[
                     'DeliveryLocationNumber'=>$order->delivery_point_iln,
-                    'DeliveryDate'=>$order->expected_delivery_date,
+                    'DeliveryDate'=>Carbon::parse($order->expected_delivery_date)->format('Y-m-d'),
                     'DespatchNumber'=>$order->order_number
                 ]
-                ];
+            ];
         }
         return $productsAfter;
     }
@@ -128,23 +128,24 @@ class InvoiceService
             }
 
 
+
             $arrayToXmlAfterConvert = [
                 'Invoice-Header'=>[
                     'InvoiceNumber'=>$arrayToXml['dok_Nr'],
-                    'InvoiceDate'=>$arrayToXml['dok_DataWyst'],
-                    'SalesDate'=>$arrayToXml['dok_PlatTermin'],
+                    'InvoiceDate'=>Carbon::parse($arrayToXml['dok_DataWyst'])->format('Y-m-d'),
+                    'SalesDate'=>Carbon::parse($arrayToXml['dok_PlatTermin'])->format('Y-m-d'),
                     'InvoiceCurrency'=>$arrayToXml['dok_Waluta'],
-                    'InvoicePaymentDueDate'=>$arrayToXml['dok_DataZakonczenia'],
+                    'InvoicePaymentDueDate'=>Carbon::parse($arrayToXml['dok_DataZakonczenia'])->format('Y-m-d'),
                     'InvoicePaymentTerms'=>config('helpers.InvoicePaymentTerms'),
                     'DocumentFunctionCode'=>$arrayToXml['dok_Podtyp'],
                     'Order'=>[
                         'BuyerOrderNumber'=>$order->order_number,
                         'SupplierOrderNumber'=>$order->order_number,
-                        'BuyerOrderDate'=>$order->order_date,
+                        'BuyerOrderDate'=>Carbon::parse($order->order_date)->format('Y-m-d'),
                     ],
                     'Delivery'=>[
                         'DeliveryLocationNumber'=>$order->delivery_point_iln,
-                        'DeliveryDate'=>$order->expected_delivery_date,
+                        'DeliveryDate'=>Carbon::parse($order->expected_delivery_date)->format('Y-m-d'),
                         'DespatchNumber'=>$order->order_number
                     ]
                 ],

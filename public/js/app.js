@@ -22720,7 +22720,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         });
       }).post(route('orders.single.invoice.post', this.order), {
         onSuccess: function onSuccess() {
-          form.reset();
+          _this.form.reset();
+
           _this.selected = null;
         }
       });
@@ -25444,7 +25445,7 @@ var _hoisted_31 = {
 var _hoisted_32 = {
   "class": "px-5 py-5 border-b border-gray-200 bg-white text-sm"
 };
-var _hoisted_33 = ["onClick"];
+var _hoisted_33 = ["disabled", "onClick"];
 var _hoisted_34 = {
   key: 2,
   "class": "px-4 py-2 mb-2 bg-gray-600 border opacity-10 border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-600 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2",
@@ -25620,10 +25621,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         /* TEXT */
         )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_32, [$data.selected == null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
           key: 0,
+          disabled: $props.order.products.length != invoice.reszta.length,
           onClick: function onClick($event) {
             return $options.saveSelection(invoice);
           },
-          "class": "px-4 py-2 mb-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-600 focus:outline-none focus:border-green-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2"
+          "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)("disabled:opacity-25 px-4 py-2 mb-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-600 focus:outline-none focus:border-green-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2")
         }, "Wybierz", 8
         /* PROPS */
         , _hoisted_33)) : $data.selected.dok_Id === invoice.dok_Id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {

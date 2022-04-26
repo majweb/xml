@@ -44,7 +44,7 @@ export default {
             .post(route('orders.single.invoice.post',this.order),
                 {
                 onSuccess: () => {
-                    form.reset();
+                    this.form.reset();
                     this.selected = null;
                 }
         }
@@ -140,7 +140,6 @@ export default {
                                                                 </div>
                                                             </div>
                                                     </td>
-                                    
                                                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                         <p class="text-gray-900 whitespace-no-wrap">
                                                             {{invoices.data[index].ob_WartNetto.toFixed(3)}} zł
@@ -157,7 +156,7 @@ export default {
                                                         </p>
                                                     </td>
                                                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                        <button v-if="selected == null" @click="saveSelection(invoice)" class="px-4 py-2 mb-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-600 focus:outline-none focus:border-green-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Wybierz</button>
+                                                        <button :disabled="order.products.length != invoice.reszta.length" v-if="selected == null" @click="saveSelection(invoice)" :class="`disabled:opacity-25 px-4 py-2 mb-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-600 focus:outline-none focus:border-green-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2`">Wybierz</button>
                                                         <button v-else-if="selected.dok_Id === invoice.dok_Id" @click="removeSelection" class="px-4 py-2 mb-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-600 focus:outline-none focus:border-red-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2">Usuń</button>
                                                         <button v-else-if="selected.dok_Id !== invoice.dok_Id" class="px-4 py-2 mb-2 bg-gray-600 border opacity-10 border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-600 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray transition ease-in-out duration-150 mr-2" disabled>Usuń</button>
                                                     </td>

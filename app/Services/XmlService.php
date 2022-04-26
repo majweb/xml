@@ -8,12 +8,20 @@ class XmlService
     public function convertProduct($products)
     {
         $productsAfter=[];
+        $checkStatus=false;
+        
         foreach($products as $key=> $product){
+            if($product['ordered_quantity'] != $product['ordered_quantity_updated']){
+                $checkStatus=true; 
+            } else {
+                $checkStatus=false; 
+            }
+
             $productsAfter['Line-Item'][]=
             [
                 'LineNumber'=>$product['line_number'],
                 'EAN'=>$product['ean'],
-                'LineItemStatus'=>5,
+                'LineItemStatus'=>$checkStatus ? 7 : 5,
                 'ItemDescription'=>[
                     '_cdata' => $product['item_description']
                 ],
@@ -38,7 +46,7 @@ class XmlService
                 'OrderResponseNumber'=>1,
                 'OrderResponseDate'=>now()->format('Y-m-d'),
                 'OrderNumber'=>$xml['order_number'],
-                'ResponseType'=>29,
+                'ResponseType'=>27,
             ],
             'OrderResponse-Parties'=>[
                 'Buyer'=>[

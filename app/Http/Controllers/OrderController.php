@@ -215,7 +215,7 @@ class OrderController extends Controller
     {
             $invoices = NULL;
             $sums = $InvoiceService->getInvoices();
-            $order->load('invoice');
+            $order->load('invoice','products');
 
             return Inertia::render('OrdersSingleInvoice',[
                 'order'=>$order,
