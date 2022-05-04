@@ -8,6 +8,7 @@ class XmlService
     public function convertProduct($products)
     {
         $productsAfter=[];
+        $test=[];
         $checkStatus=false;
         
         foreach($products as $key=> $product){
@@ -16,18 +17,20 @@ class XmlService
             } else {
                 $checkStatus=false; 
             }
-
-            $productsAfter['Line-Item'][]=
-            [
-                'LineNumber'=>$product['line_number'],
-                'EAN'=>$product['ean'],
-                'LineItemStatus'=>$checkStatus ? 7 : 5,
-                'ItemDescription'=>[
-                    '_cdata' => $product['item_description']
-                ],
-                'OrderedQuantity'=>$product['ordered_quantity'],
-                'QuantityToBeDelivered'=>$product['ordered_quantity_updated'],
-            ];
+            
+            $productsAfter[$key]['Line']=[
+                    'Line-Item'=>[
+                        'LineNumber'=>$product['line_number'],
+                        'EAN'=>$product['ean'],
+                        'LineItemStatus'=>$checkStatus ? 3 : 5,
+                        'ItemDescription'=>[
+                            '_cdata' => $product['item_description']
+                        ],
+                        'OrderedQuantity'=>$product['ordered_quantity'],
+                        'QuantityToBeDelivered'=>$product['ordered_quantity_updated'],
+                    ]
+                ];
+            
         }
         return $productsAfter;
     }
@@ -35,18 +38,19 @@ class XmlService
     public function convertAllXml($xml,$products)
     {
         $sum=0;
+        $arryChanged=[];
         foreach($products as $key=> $product){
-            foreach($product as $el){
-                $sum += $el['QuantityToBeDelivered'];
-            }
+                $sum += $product['Line']['Line-Item']['QuantityToBeDelivered'];
+                if($product['Line']['Line-Item']['OrderedQuantity'] != $product['Line']['Line-Item']['QuantityToBeDelivered']){
+                    $arryChanged[]=true; 
+                } 
         }
-
         $arrayToXmlAfterConvert = [
             'OrderResponse-Header'=>[
                 'OrderResponseNumber'=>1,
                 'OrderResponseDate'=>now()->format('Y-m-d'),
                 'OrderNumber'=>$xml['order_number'],
-                'ResponseType'=>27,
+                'ResponseType'=>count($arryChanged) ? 4 : 29,
             ],
             'OrderResponse-Parties'=>[
                 'Buyer'=>[
@@ -62,11 +66,7 @@ class XmlService
                     'ILN'=>$xml['delivery_point_iln']
                 ]
             ],
-            'OrderResponse-Lines'=>[
-                'Line'=>
-                    $products
-                
-            ],
+            'OrderResponse-Lines'=>$products,
             'OrderResponse-Summary'=>[
                 'TotalLines'=>count($xml['products']),
                 'TotalOrderedAmount'=>$sum,

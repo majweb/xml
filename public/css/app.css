@@ -1667,13 +1667,6 @@ select {
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
 }
-.disabled\:border-slate-200:disabled {
-  --tw-border-opacity: 1;
-  border-color: rgb(226 232 240 / var(--tw-border-opacity));
-}
-.disabled\:opacity-0:disabled {
-  opacity: 0;
-}
 .disabled\:opacity-25:disabled {
   opacity: 0.25;
 }
