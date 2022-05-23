@@ -82,30 +82,33 @@ class InvoiceService
         $order->load('products');
         $productsAfter=[];
         foreach($products as $key=> $product){
-            $productsAfter['Line-Item'][]=
+
+            $productsAfter[]=
             [
-                'LineNumber'=>$product['ob_TowId'],
-                'EAN'=>$order->products[$key]->ean ?? null,
-                'SerialNumber'=>$product['tw_Symbol'],
-                'ItemDescription'=>$product['tw_Nazwa'],
-                'ItemType'=>'IN',
-                'InvoiceQuantity'=>$product['ob_Ilosc'],
-                'UnitOfMeasure'=>'PCE',
-                'InvoiceUnitNetPrice'=>$product['ob_CenaNetto'],
-                'TaxRate'=>$product['ob_VatProc'],
-                'TaxCategoryCode'=>'S',
-                'TaxAmount'=>$product['ob_WartVat'],
-                'NetAmount'=>$product['ob_WartNetto'],
-                'ExpirationDate'=>$product['tw_DniWaznosc'] != 0 ? Carbon::parse($order->order_date)->addDays($product['tw_DniWaznosc'])->format('Y-m-d') : Carbon::parse($order->order_date)->addYears(5)->format('Y-m-d'),
-                'Line-Order'=>[
-                    'BuyerOrderNumber'=>$order->order_number,
-                    'SupplierOrderNumber'=>$order->order_number,
-                    'BuyerOrderDate'=>Carbon::parse($order->order_date)->format('Y-m-d'),
-                ],
-                'Line-Delivery'=>[
-                    'DeliveryLocationNumber'=>$order->delivery_point_iln,
-                    'DeliveryDate'=>Carbon::parse($order->expected_delivery_date)->format('Y-m-d'),
-                    'DespatchNumber'=>$order->order_number
+                'Line-Item'=>[
+                    'LineNumber'=>$product['ob_TowId'],
+                    'EAN'=>$order->products[$key]->ean ?? null,
+                    'SerialNumber'=>$product['tw_Symbol'],
+                    'ItemDescription'=>$product['tw_Nazwa'],
+                    'ItemType'=>'IN',
+                    'InvoiceQuantity'=>$product['ob_Ilosc'],
+                    'UnitOfMeasure'=>'PCE',
+                    'InvoiceUnitNetPrice'=>$product['ob_CenaNetto'],
+                    'TaxRate'=>$product['ob_VatProc'],
+                    'TaxCategoryCode'=>'S',
+                    'TaxAmount'=>$product['ob_WartVat'],
+                    'NetAmount'=>$product['ob_WartNetto'],
+                    'ExpirationDate'=>$product['tw_DniWaznosc'] != 0 ? Carbon::parse($order->order_date)->addDays($product['tw_DniWaznosc'])->format('Y-m-d') : Carbon::parse($order->order_date)->addYears(5)->format('Y-m-d'),
+                    'Line-Order'=>[
+                        'BuyerOrderNumber'=>$order->order_number,
+                        'SupplierOrderNumber'=>$order->order_number,
+                        'BuyerOrderDate'=>Carbon::parse($order->order_date)->format('Y-m-d'),
+                    ],
+                    'Line-Delivery'=>[
+                        'DeliveryLocationNumber'=>$order->delivery_point_iln,
+                        'DeliveryDate'=>Carbon::parse($order->expected_delivery_date)->format('Y-m-d'),
+                        'DespatchNumber'=>$order->order_number
+                    ]
                 ]
             ];
         }
@@ -127,8 +130,10 @@ class InvoiceService
                 
             }
 
-
-
+            $res=[];
+            foreach($products as $key=>$product){
+                $res['Line'][]=$product;
+            }
             $arrayToXmlAfterConvert = [
                 'Invoice-Header'=>[
                     'InvoiceNumber'=>$arrayToXml['dok_Nr'],
@@ -196,9 +201,7 @@ class InvoiceService
                         'Country'=>config('helpers.LarixCountry'),
                     ]
                 ],
-                'Invoice-Lines'=>[
-                    'Line'=>$products
-                ],
+                'Invoice-Lines'=>$res,
                 'Invoice-Summary'=>[
                     'TotalLines'=>count($arrayToXml['reszta']),
                     'TotalNetAmount'=>$arrayToXml['ob_WartNetto'],
