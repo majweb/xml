@@ -142,7 +142,7 @@ class InvoiceService
                     'InvoiceCurrency'=>$arrayToXml['dok_Waluta'],
                     'InvoicePaymentDueDate'=>Carbon::parse($arrayToXml['dok_DataZakonczenia'])->format('Y-m-d'),
                     'InvoicePaymentTerms'=>config('helpers.InvoicePaymentTerms'),
-                    'DocumentFunctionCode'=>$arrayToXml['dok_Podtyp'],
+                    'DocumentFunctionCode'=>"O",
                     'Order'=>[
                         'BuyerOrderNumber'=>$order->order_number,
                         'SupplierOrderNumber'=>$order->order_number,
